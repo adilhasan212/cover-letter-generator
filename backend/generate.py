@@ -37,9 +37,9 @@ def build_cover_letter_prompt(
         "- Do NOT include links, GitHub URLs, or portfolio URLs.\n"
         "- Do NOT repeat the candidate's contact information.\n"
         "- Start directly with the greeting.\n"
-        "- Use this structure:\n"
+        "- Use this format:\n"
         "  Candidate's Name\n"
-        "  Job Posting Location IF AVAILABLE (e.g., Remote, New York, etc.)\n"
+        "  Job Posting Location (e.g., Remote, New York, etc.) ONLY IF GIVEN BY THE USER \n"
         "  Current Date ONLY IF GIVEN BY THE USER\n"
         "  Greeting\n"
         "  Paragraph about interest in the company\n"
@@ -86,6 +86,8 @@ async def generate_cover_letter_route(
         resume_text=resume_text,
         job_description=job_description,
         company_name=company_name,
+        todays_date=todays_date,
+        job_location=job_location,
     )
 
     cover_letter = generate_cover_letter(prompt)
