@@ -11,10 +11,13 @@ export default function Home() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [todaysDate, setTodaysDate] = useState("");
+  const [jobLocation, setJobLocation] = useState("");
   const [resultText, setResultText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const hasResult = useMemo(() => resultText.trim().length > 0, [resultText]);
 
@@ -32,6 +35,8 @@ export default function Home() {
     formData.append("resume", resumeFile);
     formData.append("job_description", jobDescription);
     formData.append("company_name", companyName);
+    formData.append("todays_date", todaysDate);
+    formData.append("job_location", jobLocation);
 
     try {
       setIsLoading(true);
@@ -164,13 +169,40 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
+    <div
+      className={`min-h-screen px-4 py-10 transition-colors ${
+        isDarkMode
+          ? "bg-slate-950 text-slate-100"
+          : "bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 text-slate-900"
+      }`}
+    >
       <main className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-        <section className="rounded-2xl bg-white p-6 shadow-lg sm:p-8">
-          <h1 className="text-2xl font-semibold sm:text-3xl">Cover Letter Generator</h1>
-          <p className="mt-2 text-sm text-slate-600 sm:text-base">
-            Upload your resume and provide the job details to generate a tailored cover letter.
-          </p>
+        <section
+          className={`rounded-2xl border p-6 shadow-xl backdrop-blur sm:p-8 ${
+            isDarkMode
+              ? "border-slate-800 bg-slate-900/90 shadow-slate-950/50"
+              : "border-white/60 bg-white/90"
+          }`}
+        >
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold sm:text-3xl">Cover Letter Generator</h1>
+              <p className={`mt-2 text-sm sm:text-base ${isDarkMode ? "text-slate-300" : "text-slate-600"}`}>
+                Upload your resume and provide the job details to generate a tailored cover letter.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsDarkMode((prev) => !prev)}
+              className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                isDarkMode
+                  ? "border-slate-700 bg-slate-800 hover:bg-slate-700"
+                  : "border-slate-300 bg-white hover:bg-slate-100"
+              }`}
+            >
+              {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
             <label className="flex flex-col gap-2">
@@ -179,20 +211,59 @@ export default function Home() {
                 type="file"
                 accept="application/pdf"
                 onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-slate-200 file:px-3 file:py-2 file:text-slate-800 hover:file:bg-slate-300"
+                className={`w-full rounded-lg border px-3 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:px-3 file:py-2 ${
+                  isDarkMode
+                    ? "border-slate-700 bg-slate-900 file:bg-slate-700 file:text-slate-100 hover:file:bg-slate-600"
+                    : "border-slate-300 bg-white file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300"
+                }`}
                 required
               />
             </label>
 
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Company Name</span>
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(event) => setCompanyName(event.target.value)}
+                  placeholder="e.g. Google"
+                  className={`rounded-lg border px-3 py-2 text-sm focus:outline-none ${
+                    isDarkMode
+                      ? "border-slate-700 bg-slate-900 focus:border-slate-500"
+                      : "border-slate-300 bg-white focus:border-slate-500"
+                  }`}
+                  required
+                />
+              </label>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Today&apos;s Date (optional)</span>
+                <input
+                  type="date"
+                  value={todaysDate}
+                  onChange={(event) => setTodaysDate(event.target.value)}
+                  className={`rounded-lg border px-3 py-2 text-sm focus:outline-none ${
+                    isDarkMode
+                      ? "border-slate-700 bg-slate-900 focus:border-slate-500"
+                      : "border-slate-300 bg-white focus:border-slate-500"
+                  }`}
+                />
+              </label>
+            </div>
+
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium">Company Name</span>
+              <span className="text-sm font-medium">Job Location (optional)</span>
               <input
                 type="text"
-                value={companyName}
-                onChange={(event) => setCompanyName(event.target.value)}
-                placeholder="e.g. Acme Corp"
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-                required
+                value={jobLocation}
+                onChange={(event) => setJobLocation(event.target.value)}
+                placeholder="e.g. San Francisco, CA"
+                className={`rounded-lg border px-3 py-2 text-sm focus:outline-none ${
+                  isDarkMode
+                    ? "border-slate-700 bg-slate-900 focus:border-slate-500"
+                    : "border-slate-300 bg-white focus:border-slate-500"
+                }`}
               />
             </label>
 
@@ -203,7 +274,11 @@ export default function Home() {
                 onChange={(event) => setJobDescription(event.target.value)}
                 placeholder="Paste the full job description here..."
                 rows={8}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                className={`rounded-lg border px-3 py-2 text-sm focus:outline-none ${
+                  isDarkMode
+                    ? "border-slate-700 bg-slate-900 focus:border-slate-500"
+                    : "border-slate-300 bg-white focus:border-slate-500"
+                }`}
                 required
               />
             </label>
@@ -211,7 +286,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-500"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-400"
             >
               {isLoading ? (
                 <>
@@ -225,26 +300,46 @@ export default function Home() {
           </form>
 
           {error && (
-            <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p
+              className={`mt-4 rounded-md border px-3 py-2 text-sm ${
+                isDarkMode
+                  ? "border-red-900/70 bg-red-950/60 text-red-300"
+                  : "border-red-200 bg-red-50 text-red-700"
+              }`}
+            >
               {error}
             </p>
           )}
         </section>
 
         {hasResult && (
-          <section className="rounded-2xl bg-white p-6 shadow-lg sm:p-8">
+          <section
+            className={`rounded-2xl border p-6 shadow-xl sm:p-8 ${
+              isDarkMode ? "border-slate-800 bg-slate-900" : "border-white/60 bg-white"
+            }`}
+          >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-xl font-semibold">Generated Cover Letter</h2>
               <button
                 type="button"
                 onClick={handleCopy}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-100"
+                className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                  isDarkMode
+                    ? "border-slate-700 hover:bg-slate-800"
+                    : "border-slate-300 hover:bg-slate-100"
+                }`}
               >
                 {copied ? "Copied!" : "Copy to Clipboard"}
               </button>
             </div>
 
-            <article className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 whitespace-pre-wrap">
+            <article
+              className={`mt-4 rounded-xl border p-4 text-sm leading-7 whitespace-pre-wrap ${
+                isDarkMode
+                  ? "border-slate-800 bg-slate-950/70 text-slate-100"
+                  : "border-slate-200 bg-slate-50"
+              }`}
+            >
               {resultText}
             </article>
 
@@ -252,14 +347,18 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleDownloadPdf}
-                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
               >
                 Download as PDF
               </button>
               <button
                 type="button"
                 onClick={handleDownloadDocx}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100"
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                  isDarkMode
+                    ? "border-slate-700 hover:bg-slate-800"
+                    : "border-slate-300 hover:bg-slate-100"
+                }`}
               >
                 Download as DOCX
               </button>
