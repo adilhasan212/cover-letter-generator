@@ -108,7 +108,7 @@ export default function Home() {
       });
     });
 
-    pdf.save("cover-letter.pdf");
+    pdf.save(`${companyName.replace(/\s+/g, "-")}-cover-letter.pdf`);
   };
 
   const handleDownloadDocx = async () => {
@@ -146,7 +146,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "cover-letter.docx";
+    link.download = `${companyName.replace(/\s+/g, "-")}-cover-letter.docx`;
     link.click();
     URL.revokeObjectURL(url);
   };
