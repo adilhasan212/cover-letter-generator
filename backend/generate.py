@@ -2,6 +2,7 @@ from io import BytesIO
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pypdf import PdfReader
+from services.openai_service import generate_cover_letter
 
 router = APIRouter()
 
@@ -30,9 +31,25 @@ def build_cover_letter_prompt(
     """Build the prompt payload for a future AI generation step."""
     return (
         "You are an expert career assistant. Write a tailored cover letter.\n\n"
+        "Requirements:\n"
+        "- Keep the cover letter concise.\n"
+        "- Use plain text only. Do NOT use markdown formatting such as **, [], or hyperlinks.\n"
+        "- Do NOT include links, GitHub URLs, or portfolio URLs.\n"
+        "- Do NOT repeat the candidate's contact information.\n"
+        "- Start directly with the greeting.\n"
+        "- Use this structure:\n"
+        "  Candidate's Name\n"
+        "  Job Posting Location IF AVAILABLE (e.g., Remote, New York, etc.)\n"
+        "  Current Date ONLY IF GIVEN BY THE USER\n"
+        "  Greeting\n"
+        "  Paragraph about interest in the company\n"
+        "  Paragraph(s) highlighting relevant experience\n"
+        "  Paragraph about fit and closing\n"
+        "  Closing line and name\n"
+        "- Avoid generic phrases and avoid em dashes.\n\n"
         f"Company Name:\n{company_name}\n\n"
-        f"Today's Date:\n{todays_date or 'Not provided'}\n\n"
-        f"Job Location:\n{job_location or 'Not provided'}\n\n"
+        f"Today's Date:\n{todays_date or 'Print Nothing'}\n\n"
+        f"Job Location:\n{job_location or 'Print Nothing'}\n\n"
         f"Job Description:\n{job_description}\n\n"
         f"Candidate Resume:\n{resume_text}\n"
     )
@@ -56,7 +73,7 @@ def prepare_generation_input(
 
 
 @router.post("/generate")
-async def generate_cover_letter(
+async def generate_cover_letter_route(
     resume: UploadFile = File(...),
     job_description: str = Form(...),
     company_name: str = Form(...),
@@ -69,10 +86,10 @@ async def generate_cover_letter(
         resume_text=resume_text,
         job_description=job_description,
         company_name=company_name,
-        todays_date=todays_date,
-        job_location=job_location,
     )
 
+    cover_letter = generate_cover_letter(prompt)
+
     return {
-        "prompt": prompt,
+        "cover_letter": cover_letter
     }
